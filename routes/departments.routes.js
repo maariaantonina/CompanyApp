@@ -13,15 +13,13 @@ router.get('/departments', (req, res) => {
 });
 
 router.get('/departments/random', (req, res) => {
-  router.get('/departments/random', (req, res) => {
-    req.db
-      .collection('departments')
-      .aggregate([{ $sample: { size: 1 } }])
-      .toArray((err, data) => {
-        if (err) res.status(500).json({ message: err });
-        else res.json(data[0]);
-      });
-  });
+  req.db
+    .collection('departments')
+    .aggregate([{ $sample: { size: 1 } }])
+    .toArray((err, data) => {
+      if (err) res.status(500).json({ message: err });
+      else res.json(data[0]);
+    });
 });
 
 router.get('/departments/:id', (req, res) => {
