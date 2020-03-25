@@ -22,24 +22,28 @@ describe('Employee', () => {
 
   describe('Reading data', () => {
     before(async () => {
-      const testDepartment = new Department({ name: 'name1' });
-      await testDepartment.save();
-      const testDepartmentId = testDepartment._id;
+      const testDepOne = new Department({
+        _id: '5d9f1140f10a81216cfd4408',
+        name: 'Department #1'
+      });
+      await testDepOne.save();
 
-      const testDepartment2 = new Department({ name: 'name2' });
-      await testDepartment2.save();
-      const testDepartmentId2 = testDepartment2._id;
+      const testDepTwo = new Department({
+        _id: '5d9f1159f81ce8d1ef2bee48',
+        name: 'Department #2'
+      });
+      await testDepTwo.save();
 
       const testEmployeeOne = new Employee({
         firstName: 'name1',
         lastName: 'name1',
-        department: testDepartmentId
+        department: '5d9f1140f10a81216cfd4408'
       });
       await testEmployeeOne.save();
       const testEmployeeTwo = new Employee({
         firstName: 'name2',
         lastName: 'name2',
-        department: testDepartmentId2
+        department: '5d9f1159f81ce8d1ef2bee48'
       });
       await testEmployeeTwo.save();
     });
@@ -55,14 +59,19 @@ describe('Employee', () => {
       expect(employee.firstName).to.be.equal('name1');
     });
 
-    // it('should return a proper document by "department" with "findOne" method', async () => {
-    //   const department = await Department.findOne({ name: 'name1' });
-    //   const employee = await Employee.findOne({ department: department._id });
-    //   expect(employee.department).to.be.equal(department._id);
-    // });
+    it('should return a proper document by "department" with "findOne" method', async () => {
+      const employee = await Employee.findOne()
+        .populate({
+          path: 'department',
+          match: { name: 'Department #1' }
+        })
+        .exec();
+      expect(employee.department.name).to.be.equal('Department #1');
+    });
 
     after(async () => {
       await Employee.deleteMany();
+      await Department.deleteMany();
     });
   });
 
@@ -88,6 +97,7 @@ describe('Employee', () => {
 
     after(async () => {
       await Employee.deleteMany();
+      await Department.deleteMany();
     });
   });
 
@@ -180,6 +190,7 @@ describe('Employee', () => {
 
     afterEach(async () => {
       await Department.deleteMany();
+      await Employee.deleteMany();
     });
   });
 
@@ -241,6 +252,7 @@ describe('Employee', () => {
 
     afterEach(async () => {
       await Department.deleteMany();
+      await Employee.deleteMany();
     });
   });
 });
