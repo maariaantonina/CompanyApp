@@ -1,4 +1,5 @@
 const Employee = require('../models/employee.model');
+const Department = require('../models/department.model');
 
 exports.getAll = async (req, res) => {
   try {
@@ -12,9 +13,7 @@ exports.getRandom = async (req, res) => {
   try {
     const count = await Employee.countDocuments();
     const rand = Math.floor(Math.random() * count);
-    const employee = await await Employee.findOne()
-      .populate('department')
-      .skip(rand);
+    const employee = await Employee.findOne().populate('department').skip(rand);
     if (!employee) res.status(404).json({ message: 'Not found' });
     else res.json(employee);
   } catch (err) {
@@ -24,7 +23,7 @@ exports.getRandom = async (req, res) => {
 
 exports.getById = async (req, res) => {
   try {
-    const employee = await (await Employee.findById(req.params.id)).populated(
+    const employee = await Employee.findById(req.params.id).populate(
       'department'
     );
     if (!employee) {
@@ -37,35 +36,42 @@ exports.getById = async (req, res) => {
 
 exports.postNew = async (req, res) => {
   try {
-    const { firstName, lastName } = req.body;
-    const newEmployee = new Employee({
-      firstName: firstName,
-      lastName: lastName,
-      department: department
-    });
-    await newEmployee.save();
+    const { firstName, lastName, department } = req.body;
+    const dep = await Department.findById(department);
+    if (dep) {
+      const newEmployee = new Employee({
+        firstName: firstName,
+        lastName: lastName,
+        department: department,
+      });
+      await newEmployee.save();
+      res.status(404).json({ message: 'OK' });
+    } else {
+      res.json({ message: 'Wrong department id' });
+    }
   } catch (err) {
     res.status(500).json({ message: err });
   }
 };
 
 exports.edit = async (req, res) => {
-  const { firstName, lastName, department } = req.body;
   try {
-    const employee = await Employee.findById(req.params.id);
-    if (employee) {
-      await Employee.updateOne(
-        { _id: req.params.id },
+    const dep = await Department.findById(req.body.department);
+    if (!req.body.department || dep) {
+      await Employee.findByIdAndUpdate(
+        req.params.id,
         {
-          $set: {
-            firstName: firstName,
-            lastName: lastName,
-            department: department
-          }
+          $set: req.body,
+        },
+        { new: true },
+        (err, doc) => {
+          if (err) res.status(404).json({ message: 'Not found...' });
+          else res.json(doc);
         }
       );
-      res.json({ message: 'OK' });
-    } else res.status(404).json({ message: 'Not found...' });
+    } else {
+      res.status(404).json({ message: 'Wrong department id' });
+    }
   } catch (err) {
     res.status(500).json({ message: err });
   }
@@ -73,11 +79,10 @@ exports.edit = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
-    const employee = await Employee.findById(req.params.id);
-    if (employee) {
-      await Employee.deleteOne({ _id: req.params.id });
-      res.json({ message: 'OK' });
-    } else res.status(404).json({ message: 'Not found...' });
+    await Employee.findByIdAndRemove(req.params.id, (err, doc) => {
+      if (err) res.status(404).json({ message: 'Not found...' });
+      else res.json(doc);
+    });
   } catch (err) {
     res.status(500).json({ message: err });
   }
