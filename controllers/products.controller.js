@@ -13,7 +13,7 @@ exports.getRandom = async (req, res) => {
     const count = await Product.countDocuments();
     const rand = Math.floor(Math.random() * count);
     const product = await Product.findOne().skip(rand);
-    if (!dep) res.status(404).json({ message: 'Not found' });
+    if (!product) res.status(404).json({ message: 'Not found' });
     else res.json(product);
   } catch (err) {
     res.status(500).json({ message: err });
@@ -42,16 +42,18 @@ exports.addNew = async (req, res) => {
 };
 
 exports.change = async (req, res) => {
-  const { name, client } = req.body;
   try {
-    const product = await Product.findById(req.params.id);
-    if (product) {
-      await Product.updateOne(
-        { _id: req.params.id },
-        { $set: { name: name, client: client } }
-      );
-      res.json({ message: 'OK' });
-    } else res.status(404).json({ message: 'Not found...' });
+    await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: req.body,
+      },
+      { new: true },
+      (err, doc) => {
+        if (err) res.status(404).json({ message: 'Not found...' });
+        else res.json(doc);
+      }
+    );
   } catch (err) {
     res.status(500).json({ message: err });
   }
@@ -59,11 +61,10 @@ exports.change = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (product) {
-      await Product.deleteOne({ _id: req.params.id });
-      res.json({ message: 'OK' });
-    } else res.status(404).json({ message: 'Not found...' });
+    await Product.findByIdAndRemove(req.params.id, (err, doc) => {
+      if (err) res.status(404).json({ message: 'Not found...' });
+      else res.json(doc);
+    });
   } catch (err) {
     res.status(500).json({ message: err });
   }
