@@ -15,7 +15,7 @@
     "express": "^4.17.1",
     "mocha": "6.2.1",
     "mongodb": "3.3.2",
-    "mongodb-memory-server": "^6.4.1",
+    "mongodb-memory-server": "^7.4.4",
     "mongoose": "6.0.10",
     "nodemon": "^1.19.1",
     "onchange": "6.1.0"

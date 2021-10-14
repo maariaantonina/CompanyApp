@@ -8,10 +8,9 @@ const MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
 describe('Employee', () => {
   before(async () => {
     try {
-      const fakeDB = new MongoMemoryServer();
-      const uri = await fakeDB.getConnectionString();
+      const mongoServer = await MongoMemoryServer.create();
 
-      mongoose.connect(uri, {
+      mongoose.connect(mongoServer.getUri(), {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
@@ -142,7 +141,6 @@ describe('Employee', () => {
       const updatedEmployee = await Employee.findOne({
         department: department._id,
       }).populate('department');
-      console.log(updatedEmployee);
       expect(updatedEmployee).to.not.be.null;
       expect(updatedEmployee.department.name).to.be.equal('Department #2');
     });
@@ -253,5 +251,9 @@ describe('Employee', () => {
       await Department.deleteMany();
       await Employee.deleteMany();
     });
+  });
+
+  after(() => {
+    mongoose.models = {};
   });
 });

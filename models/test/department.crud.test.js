@@ -6,12 +6,11 @@ const MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
 describe('Department', () => {
   before(async () => {
     try {
-      const fakeDB = new MongoMemoryServer();
-      const uri = await fakeDB.getConnectionString();
+      const mongoServer = await MongoMemoryServer.create();
 
-      mongoose.connect(uri, {
+      mongoose.connect(mongoServer.getUri(), {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
       });
     } catch (err) {
       console.log(err);
@@ -48,7 +47,7 @@ describe('Department', () => {
       const department = new Department({ name: 'Department #1' });
       await department.save();
       const savedDepartment = await Department.findOne({
-        name: 'Department #1'
+        name: 'Department #1',
       });
       expect(savedDepartment).to.not.be.null;
     });
@@ -73,7 +72,7 @@ describe('Department', () => {
         { $set: { name: '=Department #1=' } }
       );
       const updatedDepartment = await Department.findOne({
-        name: '=Department #1='
+        name: '=Department #1=',
       });
       expect(updatedDepartment).to.not.be.null;
     });
@@ -84,7 +83,7 @@ describe('Department', () => {
       await department.save();
 
       const updatedDepartment = await Department.findOne({
-        name: '=Department #1='
+        name: '=Department #1=',
       });
       expect(updatedDepartment).to.not.be.null;
     });
@@ -113,7 +112,7 @@ describe('Department', () => {
     it('should properly remove one document with "deleteOne" method', async () => {
       await Department.deleteOne({ name: 'Department #1' });
       const removeDepartment = await Department.findOne({
-        name: 'Department #1'
+        name: 'Department #1',
       });
       expect(removeDepartment).to.be.null;
     });
@@ -122,7 +121,7 @@ describe('Department', () => {
       const department = await Department.findOne({ name: 'Department #1' });
       await department.remove();
       const removedDepartment = await Department.findOne({
-        name: 'Department #1'
+        name: 'Department #1',
       });
       expect(removedDepartment).to.be.null;
     });
@@ -136,5 +135,9 @@ describe('Department', () => {
     afterEach(async () => {
       await Department.deleteMany();
     });
+  });
+
+  after(() => {
+    mongoose.models = {};
   });
 });
