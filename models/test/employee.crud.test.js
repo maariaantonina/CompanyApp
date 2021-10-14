@@ -13,7 +13,7 @@ describe('Employee', () => {
 
       mongoose.connect(uri, {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
       });
     } catch (err) {
       console.log(err);
@@ -24,26 +24,26 @@ describe('Employee', () => {
     beforeEach(async () => {
       const testDepOne = new Department({
         name: 'Depo1',
-        _id: '5d9f1140f10a81216cfd4408'
+        _id: '5d9f1140f10a81216cfd4408',
       });
       await testDepOne.save();
 
       const testDepTwo = new Department({
         name: 'Depo2',
-        _id: '5d9f1159f81ce8d1ef2bee38'
+        _id: '5d9f1159f81ce8d1ef2bee38',
       });
       await testDepTwo.save();
 
       const testEmployeeOne = new Employee({
         firstName: 'name1',
         lastName: 'name1',
-        department: '5d9f1140f10a81216cfd4408'
+        department: '5d9f1140f10a81216cfd4408',
       });
       await testEmployeeOne.save();
       const testEmployeeTwo = new Employee({
         firstName: 'name2',
         lastName: 'name2',
-        department: '5d9f1159f81ce8d1ef2bee38'
+        department: '5d9f1159f81ce8d1ef2bee38',
       });
       await testEmployeeTwo.save();
     });
@@ -82,11 +82,11 @@ describe('Employee', () => {
       const employee = new Employee({
         firstName: 'name1',
         lastName: 'name1',
-        department: department._id
+        department: department._id,
       });
       await employee.save();
       const savedEmployee = await Employee.findOne({
-        firstName: 'name1'
+        firstName: 'name1',
       }).populate('department');
       expect(savedEmployee).to.not.be.null;
       expect(savedEmployee.department.name).to.be.equal('name1');
@@ -111,13 +111,13 @@ describe('Employee', () => {
       const testEmployeeOne = new Employee({
         firstName: 'name1',
         lastName: 'name1',
-        department: testDepartmentId
+        department: testDepartmentId,
       });
       await testEmployeeOne.save();
       const testEmployeeTwo = new Employee({
         firstName: 'name2',
         lastName: 'name2',
-        department: testDepartmentId2
+        department: testDepartmentId2,
       });
       await testEmployeeTwo.save();
     });
@@ -128,7 +128,7 @@ describe('Employee', () => {
         { $set: { firstName: '=name1=' } }
       );
       const updatedEmployee = await Employee.findOne({
-        firstName: '=name1='
+        firstName: '=name1=',
       });
       expect(updatedEmployee).to.not.be.null;
     });
@@ -140,7 +140,7 @@ describe('Employee', () => {
         { $set: { department: department._id } }
       );
       const updatedEmployee = await Employee.findOne({
-        department: department._id
+        department: department._id,
       }).populate('department');
       console.log(updatedEmployee);
       expect(updatedEmployee).to.not.be.null;
@@ -153,7 +153,7 @@ describe('Employee', () => {
       await employee.save();
 
       const updatedEmployee = await Employee.findOne({
-        firstName: '=name2='
+        firstName: '=name2=',
       });
       expect(updatedEmployee).to.not.be.null;
     });
@@ -166,7 +166,7 @@ describe('Employee', () => {
       await employee.save();
 
       const updatedEmployee = await Employee.findOne({
-        department: department2._id
+        department: department2._id,
       });
       expect(updatedEmployee).to.not.be.null;
       expect(employee.department).to.be.equal(department2._id);
@@ -206,13 +206,13 @@ describe('Employee', () => {
       const testEmployeeOne = new Employee({
         firstName: 'name1',
         lastName: 'name1',
-        department: testDepartmentId
+        department: testDepartmentId,
       });
       await testEmployeeOne.save();
       const testEmployeeTwo = new Employee({
         firstName: 'name2',
         lastName: 'name2',
-        department: testDepartmentId2
+        department: testDepartmentId2,
       });
       await testEmployeeTwo.save();
     });
@@ -220,7 +220,7 @@ describe('Employee', () => {
     it('should properly remove one document with "deleteOne" method', async () => {
       await Employee.deleteOne({ firstName: 'name1' });
       const removeEmployee = await Employee.findOne({
-        firstName: 'name1'
+        firstName: 'name1',
       });
       expect(removeEmployee).to.be.null;
     });
@@ -229,7 +229,7 @@ describe('Employee', () => {
       const department = await Department.findOne({ name: 'Department #1' });
       await Employee.deleteOne({ department: department._id });
       const removedEmployee = await Employee.findOne({
-        department: department._id
+        department: department._id,
       });
       expect(removedEmployee).to.be.null;
     });
@@ -238,7 +238,7 @@ describe('Employee', () => {
       const employee = await Employee.findOne({ firstName: 'name2' });
       await employee.remove();
       const removedEmployee = await Employee.findOne({
-        firstName: 'name2'
+        firstName: 'name2',
       });
       expect(removedEmployee).to.be.null;
     });
