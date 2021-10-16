@@ -56,9 +56,9 @@ exports.postNew = async (req, res) => {
 
 exports.edit = async (req, res) => {
   try {
-    const dep = Department.findById(req.body.department);
+    const dep = await Department.findById(req.body.department);
     if (!req.body.department || dep) {
-      await Employee.findByIdAndUpdate(
+      Employee.findByIdAndUpdate(
         req.params.id,
         {
           $set: req.body,
