@@ -45,7 +45,7 @@ exports.postNew = async (req, res) => {
         department: department,
       });
       await newEmployee.save();
-      res.status(404).json({ message: 'OK' });
+      res.json({ message: 'OK' });
     } else {
       res.json({ message: 'Wrong department id' });
     }
@@ -56,7 +56,7 @@ exports.postNew = async (req, res) => {
 
 exports.edit = async (req, res) => {
   try {
-    const dep = await Department.findById(req.body.department);
+    const dep = Department.findById(req.body.department);
     if (!req.body.department || dep) {
       await Employee.findByIdAndUpdate(
         req.params.id,
@@ -77,9 +77,9 @@ exports.edit = async (req, res) => {
   }
 };
 
-exports.delete = async (req, res) => {
+exports.delete = (req, res) => {
   try {
-    await Employee.findByIdAndRemove(req.params.id, (err, doc) => {
+    Employee.findByIdAndRemove(req.params.id, (err, doc) => {
       if (err) res.status(404).json({ message: 'Not found...' });
       else res.json(doc);
     });
