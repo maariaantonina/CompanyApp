@@ -41,9 +41,9 @@ exports.addNew = async (req, res) => {
   }
 };
 
-exports.change = async (req, res) => {
+exports.change = (req, res) => {
   try {
-    await Product.findByIdAndUpdate(
+    Product.findByIdAndUpdate(
       req.params.id,
       {
         $set: req.body,
@@ -59,9 +59,9 @@ exports.change = async (req, res) => {
   }
 };
 
-exports.delete = async (req, res) => {
+exports.delete = (req, res) => {
   try {
-    await Product.findByIdAndRemove(req.params.id, (err, doc) => {
+    Product.findByIdAndRemove(req.params.id, (err, doc) => {
       if (err) res.status(404).json({ message: 'Not found...' });
       else res.json(doc);
     });
