@@ -13,7 +13,13 @@
 
 This project is simple API connected to MongoDB.
 
-The DB contains of 3 collections (departments, employees, products) that can be modified using Mongoose models. All the API methods are availble in controllers folder.
+The DB contains of 3 collections (departments, employees, products) that can be modified using Mongoose models. All the API methods are available in controllers folder.
+
+Secondary goal of this project was to implement unit tests methods such as:
+
+- testing mongoose models validation,
+- testing mongoose models instance methods CRUD,
+- testing endpoints.
 
 ## Technologies
 
@@ -21,6 +27,11 @@ Project is created with:
 
 - Express.js
 - Mongoose
+
+Tests done with:
+
+- Mocha
+- Chai
 
 ## Setup
 
