@@ -1,22 +1,34 @@
 const Employee = require('../employee.model');
 const Department = require('../department.model');
 
-const expect = require('chai').expect;
 const mongoose = require('mongoose');
-const MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
+const { MongoMemoryServer } = require('mongodb-memory-server');
+
+let mongoServer = undefined;
 
 describe('Employee', () => {
-  before(async () => {
-    try {
-      const mongoServer = await MongoMemoryServer.create();
+  beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const mongoUri = mongoServer.getUri();
 
-      mongoose.connect(mongoServer.getUri(), {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
-    } catch (err) {
-      console.log(err);
+    mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+  });
+
+  afterEach(async () => {
+    const collections = mongoose.connection.collections;
+    for (let key in collections) {
+      const collection = collections[key];
+      await collection.deleteMany();
     }
+  });
+
+  afterAll(async () => {
+    await mongoose.connection.dropDatabase();
+    await mongoose.connection.close();
+    await mongoServer.stop();
   });
 
   describe('Reading data', () => {
@@ -47,34 +59,39 @@ describe('Employee', () => {
       await testEmployeeTwo.save();
     });
 
+    afterEach(async () => {
+      await Employee.deleteMany();
+      await Department.deleteMany();
+    });
+
     it('should return all the data with "find" method', async () => {
       const employees = await Employee.find();
       console.log(employees);
       const expectedLength = 2;
-      expect(employees.length).to.be.equal(expectedLength);
+      expect(employees.length).toEqual(expectedLength);
     });
 
     it('should return a proper document by "name" with "findOne" method', async () => {
       const employee = await Employee.findOne({ firstName: 'name1' });
-      expect(employee.firstName).to.be.equal('name1');
+      expect(employee.firstName).toEqual('name1');
     });
 
     it('should return a proper document by "department name" with "find" method', async () => {
       const department = await Department.find();
       const employee = await Employee.find().populate('department');
-      expect(employee[0].department.name).to.be.equal('Depo1');
+      expect(employee[0].department.name).toEqual('Depo1');
+    });
+  });
+
+  describe('Creating data', () => {
+    beforeAll(async () => {
+      const testDepartment = new Department({ name: 'name1' });
+      await testDepartment.save();
     });
 
     afterEach(async () => {
       await Employee.deleteMany();
       await Department.deleteMany();
-    });
-  });
-
-  describe('Creating data', () => {
-    before(async () => {
-      const testDepartment = new Department({ name: 'name1' });
-      await testDepartment.save();
     });
 
     it('should insert new document with "insertOne" method', async () => {
@@ -88,13 +105,8 @@ describe('Employee', () => {
       const savedEmployee = await Employee.findOne({
         firstName: 'name1',
       }).populate('department');
-      expect(savedEmployee).to.not.be.null;
-      expect(savedEmployee.department.name).to.be.equal('name1');
-    });
-
-    afterEach(async () => {
-      await Employee.deleteMany();
-      await Department.deleteMany();
+      expect(savedEmployee).not.toBeNull();
+      expect(savedEmployee.department.name).toEqual('name1');
     });
   });
 
@@ -122,6 +134,11 @@ describe('Employee', () => {
       await testEmployeeTwo.save();
     });
 
+    afterEach(async () => {
+      await Department.deleteMany();
+      await Employee.deleteMany();
+    });
+
     it('should properly update one document with "updateOne" method', async () => {
       await Employee.updateOne(
         { firstName: 'name1' },
@@ -130,7 +147,7 @@ describe('Employee', () => {
       const updatedEmployee = await Employee.findOne({
         firstName: '=name1=',
       });
-      expect(updatedEmployee).to.not.be.null;
+      expect(updatedEmployee).not.toBeNull();
     });
 
     it('should properly update one document with "updateOne" method - department info change', async () => {
@@ -142,8 +159,8 @@ describe('Employee', () => {
       const updatedEmployee = await Employee.findOne({
         department: department._id,
       }).populate('department');
-      expect(updatedEmployee).to.not.be.null;
-      expect(updatedEmployee.department.name).to.be.equal('Department #2');
+      expect(updatedEmployee).not.toBeNull();
+      expect(updatedEmployee.department.name).toEqual('Department #2');
     });
 
     it('should properly update one document with "save" method', async () => {
@@ -154,7 +171,7 @@ describe('Employee', () => {
       const updatedEmployee = await Employee.findOne({
         firstName: '=name2=',
       });
-      expect(updatedEmployee).to.not.be.null;
+      expect(updatedEmployee).not.toBeNull();
     });
 
     it('should properly update one document with "save" method - department info change', async () => {
@@ -167,28 +184,23 @@ describe('Employee', () => {
       const updatedEmployee = await Employee.findOne({
         department: department2._id,
       });
-      expect(updatedEmployee).to.not.be.null;
-      expect(employee.department).to.be.equal(department2._id);
+      expect(updatedEmployee).not.toBeNull();
+      expect(employee.department).toEqual(department2._id);
     });
 
     it('should properly update multiple documents with "updateMany" method', async () => {
       await Employee.updateMany({}, { $set: { firstName: 'Updated!' } });
       const employees = await Employee.find();
-      expect(employees[0].firstName).to.be.equal('Updated!');
-      expect(employees[1].firstName).to.be.equal('Updated!');
+      expect(employees[0].firstName).toEqual('Updated!');
+      expect(employees[1].firstName).toEqual('Updated!');
     });
 
     it('should properly update multiple documents with "updateMany" method - department info change', async () => {
       const department = await Department.findOne({ name: 'Department #1' });
       await Employee.updateMany({}, { $set: { department: department._id } });
       const employees = await Employee.find().populate('department');
-      expect(employees[0].department.name).to.be.equal('Department #1');
-      expect(employees[1].department.name).to.be.equal('Department #1');
-    });
-
-    afterEach(async () => {
-      await Department.deleteMany();
-      await Employee.deleteMany();
+      expect(employees[0].department.name).toEqual('Department #1');
+      expect(employees[1].department.name).toEqual('Department #1');
     });
   });
 
@@ -216,12 +228,17 @@ describe('Employee', () => {
       await testEmployeeTwo.save();
     });
 
+    afterEach(async () => {
+      await Department.deleteMany();
+      await Employee.deleteMany();
+    });
+
     it('should properly remove one document with "deleteOne" method', async () => {
       await Employee.deleteOne({ firstName: 'name1' });
       const removeEmployee = await Employee.findOne({
         firstName: 'name1',
       });
-      expect(removeEmployee).to.be.null;
+      expect(removeEmployee).toBeNull();
     });
 
     it('should properly remove one document with "deleteOne" method', async () => {
@@ -230,7 +247,7 @@ describe('Employee', () => {
       const removedEmployee = await Employee.findOne({
         department: department._id,
       });
-      expect(removedEmployee).to.be.null;
+      expect(removedEmployee).toBeNull();
     });
 
     it('should properly remove one document with "remove" method', async () => {
@@ -239,22 +256,13 @@ describe('Employee', () => {
       const removedEmployee = await Employee.findOne({
         firstName: 'name2',
       });
-      expect(removedEmployee).to.be.null;
+      expect(removedEmployee).toBeNull();
     });
 
     it('should properly remove multiple documents with "deleteMany" method', async () => {
       await Employee.deleteMany();
       const employees = await Employee.find();
-      expect(employees.length).to.be.equal(0);
+      expect(employees.length).toEqual(0);
     });
-
-    afterEach(async () => {
-      await Department.deleteMany();
-      await Employee.deleteMany();
-    });
-  });
-
-  after(() => {
-    mongoose.models = {};
   });
 });

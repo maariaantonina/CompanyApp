@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "mocha \"./{,!(node_modules)/**/}*.test.js\"",
+    "test": "jest ./models/test/employee.crud.test.js --runInBand ",
     "test:watch": "onchange \"./**/*.js\" -i -k -- yarn test"
   },
   "dependencies": {
@@ -13,11 +13,20 @@
     "chai-http": "4.3.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "jest": "^27.4.7",
     "mocha": "9.1.3",
     "mongodb": "4.1.3",
-    "mongodb-memory-server": "^7.4.4",
+    "mongodb-memory-server": "8.2.0",
     "mongoose": "6.0.11",
     "nodemon": "^2.0.13",
     "onchange": "7.1.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "4.2.3"
+    }
   }
 }
