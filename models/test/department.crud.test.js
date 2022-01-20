@@ -3,6 +3,8 @@ const Department = require('../department.model');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
+let mongoServer = undefined;
+
 describe('Department', () => {
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -29,7 +31,7 @@ describe('Department', () => {
   });
 
   describe('Reading data', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
       const testDepOne = new Department({ name: 'Department #1' });
       await testDepOne.save();
 
@@ -37,7 +39,7 @@ describe('Department', () => {
       await testDepTwo.save();
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       await Department.deleteMany();
     });
 
