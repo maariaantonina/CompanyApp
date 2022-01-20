@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "jest ./models/test/employee.crud.test.js --runInBand ",
+    "test": "jest --runInBand ",
     "test:watch": "onchange \"./**/*.js\" -i -k -- yarn test"
   },
   "dependencies": {

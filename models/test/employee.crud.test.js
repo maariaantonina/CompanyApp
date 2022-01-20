@@ -66,7 +66,6 @@ describe('Employee', () => {
 
     it('should return all the data with "find" method', async () => {
       const employees = await Employee.find();
-      console.log(employees);
       const expectedLength = 2;
       expect(employees.length).toEqual(expectedLength);
     });

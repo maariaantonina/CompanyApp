@@ -1,24 +1,35 @@
 const Department = require('../department.model');
-const expect = require('chai').expect;
+
 const mongoose = require('mongoose');
-const MongoMemoryServer = require('mongodb-memory-server').MongoMemoryServer;
+const { MongoMemoryServer } = require('mongodb-memory-server');
 
 describe('Department', () => {
-  before(async () => {
-    try {
-      const mongoServer = await MongoMemoryServer.create();
+  beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const mongoUri = mongoServer.getUri();
 
-      mongoose.connect(mongoServer.getUri(), {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      });
-    } catch (err) {
-      console.log(err);
+    mongoose.connect(mongoUri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+  });
+
+  afterEach(async () => {
+    const collections = mongoose.connection.collections;
+    for (let key in collections) {
+      const collection = collections[key];
+      await collection.deleteMany();
     }
   });
 
+  afterAll(async () => {
+    await mongoose.connection.dropDatabase();
+    await mongoose.connection.close();
+    await mongoServer.stop();
+  });
+
   describe('Reading data', () => {
-    before(async () => {
+    beforeAll(async () => {
       const testDepOne = new Department({ name: 'Department #1' });
       await testDepOne.save();
 
@@ -26,34 +37,34 @@ describe('Department', () => {
       await testDepTwo.save();
     });
 
+    afterAll(async () => {
+      await Department.deleteMany();
+    });
+
     it('should return all the data with "find" method', async () => {
       const departments = await Department.find();
       const expectedLength = 2;
-      expect(departments.length).to.be.equal(expectedLength);
+      expect(departments.length).toEqual(expectedLength);
     });
 
     it('should return a proper document by "name" with "findOne" method', async () => {
       const department = await Department.findOne({ name: 'Department #1' });
-      expect(department.name).to.be.equal('Department #1');
-    });
-
-    after(async () => {
-      await Department.deleteMany();
+      expect(department.name).toEqual('Department #1');
     });
   });
 
   describe('Creating data', () => {
+    afterAll(async () => {
+      await Department.deleteMany();
+    });
+
     it('should insert new document with "insertOne" method', async () => {
       const department = new Department({ name: 'Department #1' });
       await department.save();
       const savedDepartment = await Department.findOne({
         name: 'Department #1',
       });
-      expect(savedDepartment).to.not.be.null;
-    });
-
-    after(async () => {
-      await Department.deleteMany();
+      expect(savedDepartment).not.toBeNull();
     });
   });
 
@@ -66,6 +77,10 @@ describe('Department', () => {
       await testDepTwo.save();
     });
 
+    afterEach(async () => {
+      await Department.deleteMany();
+    });
+
     it('should properly update one document with "updateOne" method', async () => {
       await Department.updateOne(
         { name: 'Department #1' },
@@ -74,7 +89,7 @@ describe('Department', () => {
       const updatedDepartment = await Department.findOne({
         name: '=Department #1=',
       });
-      expect(updatedDepartment).to.not.be.null;
+      expect(updatedDepartment).not.toBeNull();
     });
 
     it('should properly update one document with "save" method', async () => {
@@ -85,18 +100,14 @@ describe('Department', () => {
       const updatedDepartment = await Department.findOne({
         name: '=Department #1=',
       });
-      expect(updatedDepartment).to.not.be.null;
+      expect(updatedDepartment).not.toBeNull();
     });
 
     it('should properly update multiple documents with "updateMany" method', async () => {
       await Department.updateMany({}, { $set: { name: 'Updated!' } });
       const departments = await Department.find();
-      expect(departments[0].name).to.be.equal('Updated!');
-      expect(departments[1].name).to.be.equal('Updated!');
-    });
-
-    afterEach(async () => {
-      await Department.deleteMany();
+      expect(departments[0].name).toEqual('Updated!');
+      expect(departments[1].name).toEqual('Updated!');
     });
   });
 
@@ -109,12 +120,16 @@ describe('Department', () => {
       await testDepTwo.save();
     });
 
+    afterEach(async () => {
+      await Department.deleteMany();
+    });
+
     it('should properly remove one document with "deleteOne" method', async () => {
       await Department.deleteOne({ name: 'Department #1' });
       const removeDepartment = await Department.findOne({
         name: 'Department #1',
       });
-      expect(removeDepartment).to.be.null;
+      expect(removeDepartment).toBeNull();
     });
 
     it('should properly remove one document with "remove" method', async () => {
@@ -123,21 +138,13 @@ describe('Department', () => {
       const removedDepartment = await Department.findOne({
         name: 'Department #1',
       });
-      expect(removedDepartment).to.be.null;
+      expect(removedDepartment).toBeNull();
     });
 
     it('should properly remove multiple documents with "deleteMany" method', async () => {
       await Department.deleteMany();
       const departments = await Department.find();
-      expect(departments.length).to.be.equal(0);
+      expect(departments.length).toEqual(0);
     });
-
-    afterEach(async () => {
-      await Department.deleteMany();
-    });
-  });
-
-  after(() => {
-    mongoose.models = {};
   });
 });
