@@ -1,6 +1,8 @@
 const Employee = require('../employee.model.js');
 const mongoose = require('mongoose');
 
+jest.useFakeTimers();
+
 describe('Employee', () => {
   afterAll(() => {
     mongoose.models = {};

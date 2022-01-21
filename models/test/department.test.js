@@ -1,10 +1,11 @@
 const Department = require('../department.model.js');
 const mongoose = require('mongoose');
 
+jest.useFakeTimers();
+
 describe('Department', () => {
-  afterAll(async () => {
+  afterAll(() => {
     mongoose.models = {};
-    await mongoose.connection.close();
   });
 
   it('should throw an error if no "name" arg', () => {

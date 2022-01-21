@@ -1,7 +1,13 @@
 const Product = require('../product.model.js');
 const mongoose = require('mongoose');
 
+jest.useFakeTimers();
+
 describe('Product', () => {
+  afterAll(() => {
+    mongoose.models = {};
+  });
+
   it('should throw an error if any arg is missing', () => {
     const product1 = new Product({});
     const product2 = new Product({ name: 'concert' });
@@ -30,9 +36,5 @@ describe('Product', () => {
     product.validate((err) => {
       expect(err).toBeNull();
     });
-  });
-
-  afterAll(() => {
-    mongoose.models = {};
   });
 });
