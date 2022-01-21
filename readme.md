@@ -32,6 +32,7 @@ Tests done with:
 
 - Mocha
 - Chai
+- Jest
 
 ## Setup
 
@@ -48,3 +49,4 @@ Launches the test runner in the interactive watch mode.
 ## Status
 
 It was my first project with Mongo. Pure fun.
+Edit: Needed to use Jest to test Mongoose models logic as well as CRUD operations. Still, there is a bug - after tests my DB is empty. Trying to work it out.

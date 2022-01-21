@@ -4,10 +4,6 @@ const mongoose = require('mongoose');
 jest.useFakeTimers();
 
 describe('Department', () => {
-  afterAll(() => {
-    mongoose.models = {};
-  });
-
   it('should throw an error if no "name" arg', () => {
     const dep = new Department({}); // create new Department, but don't set `name` attr value
     dep.validate((err) => {

@@ -4,10 +4,6 @@ const mongoose = require('mongoose');
 jest.useFakeTimers();
 
 describe('Employee', () => {
-  afterAll(() => {
-    mongoose.models = {};
-  });
-
   it('should throw an error if any arg is missing', () => {
     const employee0 = new Employee({});
     const employee1 = new Employee({
