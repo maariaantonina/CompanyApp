@@ -1,5 +1,4 @@
 const Product = require('../product.model.js');
-const expect = require('chai').expect;
 const mongoose = require('mongoose');
 
 describe('Product', () => {
@@ -10,7 +9,7 @@ describe('Product', () => {
     const cases = [product1, product2, product3];
     for (let product of cases) {
       product.validate((err) => {
-        expect(err.errors).to.exist;
+        expect(err.errors).not.toBeNull();
       });
     }
   });
@@ -21,7 +20,7 @@ describe('Product', () => {
     const cases = [product1, product2];
     for (let product of cases) {
       product.validate((err) => {
-        expect(err.errors).to.exist;
+        expect(err.errors).not.toBeNull();
       });
     }
   });
@@ -29,11 +28,11 @@ describe('Product', () => {
   it('should not throw an error if everything is OK', () => {
     const product = new Product({ name: 'concert', client: 'Coco Chanel' });
     product.validate((err) => {
-      expect(err).to.not.exist;
+      expect(err).toBeNull();
     });
   });
 
-  after(() => {
+  afterAll(() => {
     mongoose.models = {};
   });
 });

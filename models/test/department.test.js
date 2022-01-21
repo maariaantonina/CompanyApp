@@ -1,12 +1,16 @@
 const Department = require('../department.model.js');
-const expect = require('chai').expect;
 const mongoose = require('mongoose');
 
 describe('Department', () => {
+  afterAll(async () => {
+    mongoose.models = {};
+    await mongoose.connection.close();
+  });
+
   it('should throw an error if no "name" arg', () => {
     const dep = new Department({}); // create new Department, but don't set `name` attr value
     dep.validate((err) => {
-      expect(err.errors.name).to.exist;
+      expect(err.errors.name).not.toBeNull();
     });
   });
 
@@ -15,7 +19,7 @@ describe('Department', () => {
     for (let name of cases) {
       const dep = new Department({ name });
       dep.validate((err) => {
-        expect(err.errors.name).to.exist;
+        expect(err.errors.name).not.toBeNull();
       });
     }
   });
@@ -25,7 +29,7 @@ describe('Department', () => {
     for (let name of cases) {
       const dep = new Department({ name });
       dep.validate((err) => {
-        expect(err.errors.name).to.exist;
+        expect(err.errors.name).not.toBeNull();
       });
     }
   });
@@ -36,12 +40,8 @@ describe('Department', () => {
       const dep = new Department({ name });
 
       dep.validate((err) => {
-        expect(err).to.not.exist;
+        expect(err).toBeNull();
       });
     }
-  });
-
-  after(() => {
-    mongoose.models = {};
   });
 });
