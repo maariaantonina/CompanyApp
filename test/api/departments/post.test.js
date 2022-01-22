@@ -9,6 +9,9 @@ const expect = chai.expect;
 const request = chai.request;
 
 describe('POST /api/departments', () => {
+  after(async () => {
+    await Department.deleteOne({ name: '#Department #1' });
+  });
   it('/ should insert new document to db and return success', async () => {
     const res = await request(server)
       .post('/api/departments')
@@ -17,9 +20,5 @@ describe('POST /api/departments', () => {
     expect(res.status).to.be.equal(200);
     expect(res.body.message).to.be.equal('OK');
     expect(newDepartment).to.not.be.null;
-  });
-
-  after(async () => {
-    await Department.deleteMany();
   });
 });
