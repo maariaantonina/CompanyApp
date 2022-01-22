@@ -23,6 +23,10 @@ describe('DELETE /api/employees', () => {
     await testEmployee.save();
   });
 
+  after(async () => {
+    await Department.deleteOne({ name: 'Dep1' });
+  });
+
   it('/:id should delete chosen document and return success', async () => {
     const res = await request(server).delete(
       '/api/employees/5d9f1140f10a81216cfd4408'
@@ -33,10 +37,5 @@ describe('DELETE /api/employees', () => {
 
     expect(res.status).to.be.equal(200);
     expect(deletedEmployee).to.be.null;
-  });
-
-  after(async () => {
-    await Department.deleteMany();
-    await Employee.deleteMany();
   });
 });

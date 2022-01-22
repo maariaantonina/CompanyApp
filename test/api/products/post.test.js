@@ -9,6 +9,10 @@ const expect = chai.expect;
 const request = chai.request;
 
 describe('POST /api/products', () => {
+  after(async () => {
+    await Product.deleteOne({ name: '#product #1' });
+  });
+
   it('/ should insert new document to db and return success', async () => {
     const res = await request(server)
       .post('/api/products')
@@ -17,9 +21,5 @@ describe('POST /api/products', () => {
     expect(res.status).to.be.equal(200);
     expect(res.body.message).to.be.equal('OK');
     expect(newproduct).to.not.be.null;
-  });
-
-  after(async () => {
-    await Product.deleteMany();
   });
 });

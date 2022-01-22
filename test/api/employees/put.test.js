@@ -23,6 +23,11 @@ describe('PUT /api/employees', () => {
     await testEmployee.save();
   });
 
+  after(async () => {
+    await Department.deleteOne({ name: 'Dep1' });
+    await Employee.deleteMany({ _id: '5d9f1140f10a81216cfd4408' });
+  });
+
   it('/:id should update chosen document and return success', async () => {
     const res = await request(server)
       .put('/api/employees/5d9f1140f10a81216cfd4408')
@@ -35,10 +40,5 @@ describe('PUT /api/employees', () => {
     expect(res.status).to.be.equal(200);
     expect(res.body).to.not.be.null;
     expect(updatedEmployee.firstName).to.be.equal('Ala');
-  });
-
-  after(async () => {
-    await Department.deleteMany();
-    await Employee.deleteMany();
   });
 });

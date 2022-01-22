@@ -15,6 +15,11 @@ describe('POST /api/employees', () => {
     await testDepartment.save();
   });
 
+  after(async () => {
+    await Department.deleteOne({ name: 'Dep1' });
+    await Employee.deleteOne({ firstName: 'Klara' });
+  });
+
   it('/ should insert new document to db and return success', async () => {
     const testDepartment = await Department.findOne({ name: 'Dep1' });
     const res = await request(server).post('/api/employees').send({
@@ -30,10 +35,5 @@ describe('POST /api/employees', () => {
     expect(res.status).to.be.equal(200);
     expect(res.body.message).to.be.equal('OK');
     expect(newEmployee).to.not.be.null;
-  });
-
-  after(async () => {
-    await Department.deleteMany();
-    await Employee.deleteMany();
   });
 });

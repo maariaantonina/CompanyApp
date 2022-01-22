@@ -18,6 +18,10 @@ describe('PUT /api/products', () => {
     await testProductOne.save();
   });
 
+  after(async () => {
+    await Product.deleteOne({ _id: '5d9f1140f10a81216cfd4408' });
+  });
+
   it('/:id should update chosen document and return success', async () => {
     const res = await request(server)
       .put('/api/products/5d9f1140f10a81216cfd4408')
@@ -28,9 +32,5 @@ describe('PUT /api/products', () => {
     expect(res.status).to.be.equal(200);
     expect(res.body).to.not.be.null;
     expect(updatedProduct.name).to.be.equal('#Product #1');
-  });
-
-  after(async () => {
-    await Product.deleteMany();
   });
 });

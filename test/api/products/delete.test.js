@@ -28,8 +28,4 @@ describe('DELETE /api/products', () => {
     expect(res.status).to.be.equal(200);
     expect(deletedProduct).to.be.null;
   });
-
-  after(async () => {
-    await Product.deleteMany();
-  });
 });
