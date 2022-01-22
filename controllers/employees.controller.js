@@ -3,7 +3,7 @@ const Department = require('../models/department.model');
 
 exports.getAll = async (req, res) => {
   try {
-    res.json(await Employee.find());
+    res.json(await Employee.find().populate('department'));
   } catch (err) {
     res.status(500).json({ message: err });
   }
